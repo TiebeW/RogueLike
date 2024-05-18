@@ -169,11 +169,11 @@ public class DungeonGenerator : MonoBehaviour
             // create different enemies
             if (Random.value < 0.5f)
             {
-                GameManager.Get.CreateActor("enemy1", new Vector2(x, y));
+                GameManager.Get.CreateActor("Wasp", new Vector2(x, y));
             }
             else
             {
-                GameManager.Get.CreateActor("enemy2", new Vector2(x, y));
+                GameManager.Get.CreateActor("Beetle", new Vector2(x, y));
             }
         }
     }

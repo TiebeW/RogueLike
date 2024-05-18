@@ -9,6 +9,9 @@ public class GameManager : MonoBehaviour
     // Lijst van vijanden
     private List<Actor> enemies = new List<Actor>();
 
+    // Variabele voor de speler
+    private Actor player;
+
     private void Awake()
     {
         if (instance == null)
@@ -30,9 +33,37 @@ public class GameManager : MonoBehaviour
         enemies.Add(enemy);
     }
 
-    // Functie om een actor op een locatie te krijgen (nog te implementeren)
+    // Functie om de speler in te stellen
+    public void SetPlayer(Actor player)
+    {
+        this.player = player;
+    }
+
+    // Functie om de speler op te halen
+    public Actor GetPlayer()
+    {
+        return player;
+    }
+
+    // Functie om een actor op een locatie te krijgen
     public Actor GetActorAtLocation(Vector3 location)
     {
+        // Controleer of de locatie gelijk is aan de positie van de speler
+        if (player != null && player.transform.position == location)
+        {
+            return player;
+        }
+
+        // Controleer of de locatie gelijk is aan de positie van een vijand
+        foreach (Actor enemy in enemies)
+        {
+            if (enemy.transform.position == location)
+            {
+                return enemy;
+            }
+        }
+
+        // Als geen actor gevonden is op de locatie, geef null terug
         return null;
     }
 
@@ -46,11 +77,36 @@ public class GameManager : MonoBehaviour
             Actor actorComponent = actorObject.GetComponent<Actor>();
             if (actorComponent != null)
             {
-                AddEnemy(actorComponent);
+                // Voeg toe als vijand of speler, afhankelijk van het type
+                if (actorType == "Player")
+                {
+                    SetPlayer(actorComponent);
+                }
+                else
+                {
+                    AddEnemy(actorComponent);
+                }
                 return actorComponent;
             }
         }
         Debug.LogError($"Actor type '{actorType}' could not be created.");
         return null;
+    }
+
+    // Functie om de beurt van alle vijanden te starten
+    public void StartEnemyTurn()
+    {
+        foreach (Actor enemyActor in enemies)
+        {
+            Enemy enemyComponent = enemyActor.GetComponent<Enemy>();
+            if (enemyComponent != null)
+            {
+                enemyComponent.RunAI();
+            }
+            else
+            {
+                Debug.LogError("Enemy component not found on Actor.");
+            }
+        }
     }
 }
