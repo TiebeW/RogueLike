@@ -109,4 +109,18 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
+    // Functie om een vijand uit de lijst met vijanden te verwijderen
+    public void RemoveEnemy(Actor enemy)
+    {
+        if (enemies.Contains(enemy))
+        {
+            enemies.Remove(enemy);
+            Destroy(enemy.gameObject);  // Verwijder het vijand GameObject uit de scène
+        }
+        else
+        {
+            Debug.LogError("Enemy not found in the list.");
+        }
+    }
 }
