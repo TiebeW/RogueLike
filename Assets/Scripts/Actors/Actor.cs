@@ -8,13 +8,11 @@ public class Actor : MonoBehaviour
     public List<Vector3Int> FieldOfView = new List<Vector3Int>();
     public int FieldOfViewRange = 8;
 
-
     [Header("Powers")]
     [SerializeField] private int maxHitPoints = 30;
     [SerializeField] private int hitPoints = 30;
     [SerializeField] private int defense;
     [SerializeField] private int power;
-
 
     public int MaxHitPoints => maxHitPoints;
     public int HitPoints => hitPoints;
@@ -46,12 +44,16 @@ public class Actor : MonoBehaviour
         }
 
         // Create a gravestone at the actor's position
-        GameObject gravestone = GameManager.Get.CreateActor("Dead", transform.position);
-        gravestone.name = $"Remains of {name}";
+        Actor gravestoneActor = GameManager.Get.CreateActor("Dead", transform.position);
+        if (gravestoneActor != null)
+        {
+            gravestoneActor.name = $"Remains of {name}";
+        }
 
         // Destroy this actor's game object
         Destroy(gameObject);
     }
+
     public void DoDamage(int hp)
     {
         hitPoints -= hp;

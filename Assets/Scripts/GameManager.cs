@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
-    // Voeg deze functie toe
+    // Functie om een nieuwe Actor te creëren
     public Actor CreateActor(string actorType, Vector2 position)
     {
         GameObject actorPrefab = Resources.Load<GameObject>($"Prefabs/{actorType}");
