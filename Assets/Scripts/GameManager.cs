@@ -9,6 +9,9 @@ public class GameManager : MonoBehaviour
     // Lijst van vijanden
     private List<Actor> enemies = new List<Actor>();
 
+    // Lijst van consumables
+    private List<Consumable> items = new List<Consumable>();
+
     // Variabele voor de speler
     private Actor player;
 
@@ -122,5 +125,39 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogError("Enemy not found in the list.");
         }
+    }
+
+    // Functie om een item toe te voegen aan de lijst
+    public void AddItem(Consumable item)
+    {
+        items.Add(item);
+    }
+
+    // Functie om een item uit de lijst te verwijderen
+    public void RemoveItem(Consumable item)
+    {
+        if (items.Contains(item))
+        {
+            items.Remove(item);
+            Destroy(item.gameObject);  // Verwijder het item GameObject uit de scène
+        }
+        else
+        {
+            Debug.LogError("Item not found in the list.");
+        }
+    }
+
+    // Functie om een item op een specifieke locatie te krijgen
+    public Consumable GetItemAtLocation(Vector3 location)
+    {
+        foreach (Consumable item in items)
+        {
+            if (item.transform.position == location)
+            {
+                return item;
+            }
+        }
+        // Als geen item gevonden is op de locatie, geef null terug
+        return null;
     }
 }
