@@ -31,10 +31,15 @@ public class UIManager : MonoBehaviour
         // Get the script components from the GameObjects
         if (HealthBar != null)
         {
+            Debug.Log("HealthBar GameObject is assigned in the Inspector.");
             healthBar = HealthBar.GetComponent<HealthBar>();
             if (healthBar == null)
             {
                 Debug.LogError("HealthBar component is not found on the assigned HealthBarObject!");
+            }
+            else
+            {
+                Debug.Log("HealthBar component found successfully.");
             }
         }
         else
@@ -44,7 +49,20 @@ public class UIManager : MonoBehaviour
 
         if (Messages != null)
         {
+            Debug.Log("Messages GameObject assigned.");
             messagesController = Messages.GetComponent<Messages>();
+            if (messagesController == null)
+            {
+                Debug.LogError("Messages component is not found on the assigned MessagesObject!");
+            }
+            else
+            {
+                Debug.Log("Messages component found successfully.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Messages is not assigned in the UIManager!");
         }
 
         // Initial clear and welcome message

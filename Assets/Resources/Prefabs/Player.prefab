@@ -100,6 +100,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FieldOfView: []
   FieldOfViewRange: 8
+  maxHitPoints: 30
+  hitPoints: 30
+  defense: 2
+  power: 4
 --- !u!114 &4288702088314335506
 MonoBehaviour:
   m_ObjectHideFlags: 0
