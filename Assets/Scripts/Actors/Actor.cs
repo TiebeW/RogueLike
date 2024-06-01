@@ -95,4 +95,16 @@ public class Actor : MonoBehaviour
             MapManager.Get.UpdateFogMap(FieldOfView);
         }
     }
+
+    public void Heal(int hp)
+    {
+        int healAmount = Mathf.Min(maxHitPoints - hitPoints, hp);
+        hitPoints += healAmount;
+
+        if (GetComponent<Player>())
+        {
+            UIManager.Instance.UpdateHealth(hitPoints, maxHitPoints);
+            UIManager.Instance.AddMessage($"You were healed for {healAmount} HP!", Color.green);
+        }
+    }
 }

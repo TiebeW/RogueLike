@@ -7,6 +7,8 @@ public class Enemy : MonoBehaviour
     public bool IsFighting { get; private set; } = false;
     private AStar Algorithm;
 
+    private int confused = 0;
+
     private void Start()
     {
         // Haal het Actor-component op en voeg het toe aan de GameManager
@@ -45,6 +47,14 @@ public class Enemy : MonoBehaviour
                 IsFighting = true;
             }
 
+            // Check if confused
+            if (confused > 0)
+            {
+                UIManager.Instance.AddMessage($"{name} is confused and cannot act", Color.gray);
+                confused--;
+                return;
+            }
+
             // Calculate the distance to the target
             float distance = Vector3.Distance(transform.position, Target.transform.position);
 
@@ -59,5 +69,10 @@ public class Enemy : MonoBehaviour
                 MoveAlongPath(targetGridPosition);
             }
         }
+    }
+
+    public void Confuse(float duration)
+    {
+        confused = Mathf.RoundToInt(duration);
     }
 }

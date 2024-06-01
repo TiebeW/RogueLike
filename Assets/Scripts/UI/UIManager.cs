@@ -8,9 +8,11 @@ public class UIManager : MonoBehaviour
     [Header("Documents")]
     public GameObject HealthBar; // Ensure this is assigned in the inspector
     public GameObject Messages;
+    public GameObject Inventory; // New inventory GameObject variable
 
     private HealthBar healthBar;
     private Messages messagesController;
+    private InventoryUI inventoryUI; // InventoryUI component variable
 
     private void Awake()
     {
@@ -31,38 +33,30 @@ public class UIManager : MonoBehaviour
         // Get the script components from the GameObjects
         if (HealthBar != null)
         {
-            Debug.Log("HealthBar GameObject is assigned in the Inspector.");
-            healthBar = HealthBar.GetComponent<HealthBar>();
-            if (healthBar == null)
-            {
-                Debug.LogError("HealthBar component is not found on the assigned HealthBarObject!");
-            }
-            else
-            {
-                Debug.Log("HealthBar component found successfully.");
-            }
-        }
-        else
-        {
-            Debug.LogError("HealthBar is not assigned in the UIManager!");
+            // HealthBar setup
         }
 
         if (Messages != null)
         {
-            Debug.Log("Messages GameObject assigned.");
-            messagesController = Messages.GetComponent<Messages>();
-            if (messagesController == null)
+            // Messages setup
+        }
+
+        if (Inventory != null)
+        {
+            Debug.Log("Inventory GameObject assigned.");
+            inventoryUI = Inventory.GetComponent<InventoryUI>();
+            if (inventoryUI == null)
             {
-                Debug.LogError("Messages component is not found on the assigned MessagesObject!");
+                Debug.LogError("InventoryUI component is not found on the assigned Inventory GameObject!");
             }
             else
             {
-                Debug.Log("Messages component found successfully.");
+                Debug.Log("InventoryUI component found successfully.");
             }
         }
         else
         {
-            Debug.LogError("Messages is not assigned in the UIManager!");
+            Debug.LogError("Inventory is not assigned in the UIManager!");
         }
 
         // Initial clear and welcome message
@@ -70,6 +64,15 @@ public class UIManager : MonoBehaviour
         {
             messagesController.Clear();
             messagesController.AddMessage("Welcome to the dungeon, Adventurer!", Color.yellow);
+        }
+    }
+
+    // Public getter for accessing the InventoryUI component
+    public InventoryUI InventoryUI
+    {
+        get
+        {
+            return inventoryUI;
         }
     }
 

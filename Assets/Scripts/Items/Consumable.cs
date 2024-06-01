@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class Consumable : MonoBehaviour
 {
     public enum ItemType
@@ -15,9 +14,33 @@ public class Consumable : MonoBehaviour
     [SerializeField]
     private ItemType type;
 
+    [SerializeField]
+    private int healingAmount;
+
+    [SerializeField]
+    private int damage;
+
+    [SerializeField]
+    private float confusionDuration;
+
     public ItemType Type
     {
         get { return type; }
+    }
+
+    public int HealingAmount
+    {
+        get { return healingAmount; }
+    }
+
+    public int Damage
+    {
+        get { return damage; }
+    }
+
+    public float ConfusionDuration
+    {
+        get { return confusionDuration; }
     }
 
     private void Start()
@@ -25,5 +48,3 @@ public class Consumable : MonoBehaviour
         GameManager.Get.AddItem(this);
     }
 }
-
-
