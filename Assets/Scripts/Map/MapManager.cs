@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public class MapManager : MonoBehaviour
 {
@@ -37,7 +36,6 @@ public class MapManager : MonoBehaviour
     public List<Vector3Int> VisibleTiles;
     public Dictionary<Vector3Int, TileData> Tiles;
 
-
     [Header("Map Settings")]
     public int width = 80;
     public int height = 45;
@@ -45,7 +43,8 @@ public class MapManager : MonoBehaviour
     public int roomMinSize = 6;
     public int maxRooms = 30;
     public int maxEnemies = 2;
-    public int maxItems = 2; // Toegevoegd
+    public int maxItems = 2;
+    public int floor = 0; // Toegevoegd
 
     private void Start()
     {
@@ -54,6 +53,11 @@ public class MapManager : MonoBehaviour
 
     private void GenerateDungeon()
     {
+        // Wis de bestaande tiles in de TileMaps
+        FloorMap.ClearAllTiles();
+        ObstacleMap.ClearAllTiles();
+        FogMap.ClearAllTiles();
+
         Tiles = new Dictionary<Vector3Int, TileData>();
         VisibleTiles = new List<Vector3Int>();
 
@@ -62,7 +66,8 @@ public class MapManager : MonoBehaviour
         generator.SetRoomSize(roomMinSize, roomMaxSize);
         generator.SetMaxRooms(maxRooms);
         generator.SetMaxEnemies(maxEnemies);
-        generator.SetMaxItems(maxItems); // Doorgegeven waarde voor maxItems
+        generator.SetMaxItems(maxItems);
+        generator.SetCurrentFloor(floor); // Gebruik de waarde van floor
         generator.Generate();
 
         AddTileMapToDictionary(FloorMap);
@@ -75,6 +80,16 @@ public class MapManager : MonoBehaviour
         GameObject actor = Instantiate(Resources.Load<GameObject>($"Prefabs/{name}"), new Vector3(position.x + 0.5f, position.y + 0.5f, 0), Quaternion.identity);
         actor.name = name;
         return actor;
+    }
+
+    public GameObject GetActor(string name)
+    {
+        var actors = GameObject.FindGameObjectsWithTag(name);
+        if (actors.Length > 0)
+        {
+            return actors[0];
+        }
+        return null;
     }
 
     public bool InBounds(int x, int y) => 0 <= x && x < width && 0 <= y && y < height;
@@ -148,6 +163,23 @@ public class MapManager : MonoBehaviour
             Tiles[pos].IsVisible = true;
             FogMap.SetColor(pos, Color.clear);
             VisibleTiles.Add(pos);
+        }
+    }
+
+    public void MoveUp()
+    {
+        ClearFloor();
+        floor++;
+        GenerateDungeon();
+    }
+
+    public void MoveDown()
+    {
+        ClearFloor();
+        if (floor > 0)
+        {
+            floor--;
+            GenerateDungeon();
         }
     }
 }

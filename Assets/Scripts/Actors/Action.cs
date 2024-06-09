@@ -32,7 +32,7 @@ public class Action : MonoBehaviour
         int damage = actor.Power - target.Defense;
         if (damage > 0)
         {
-            target.DoDamage(damage);
+            target.DoDamage(damage, actor);
             if (actor.GetComponent<Player>() != null)
             {
                 UIManager.Instance.AddMessage($"{actor.name} hits {target.name} for {damage} damage!", Color.white);

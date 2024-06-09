@@ -1,22 +1,24 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
-    // Singleton instance
     public static UIManager Instance { get; private set; }
 
     [Header("Documents")]
-    public GameObject HealthBar; // Ensure this is assigned in the inspector
+    public GameObject HealthBar;
     public GameObject Messages;
-    public GameObject Inventory; // New inventory GameObject variable
+    public GameObject Inventory;
+    public GameObject FloorInfo;
 
     private HealthBar healthBar;
     private Messages messagesController;
-    private InventoryUI inventoryUI; // InventoryUI component variable
+    private InventoryUI inventoryUI;
+    private Text floorText;
+    private Text enemiesText;
 
     private void Awake()
     {
-        // Implement singleton pattern
         if (Instance == null)
         {
             Instance = this;
@@ -30,28 +32,22 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
-        // Get the script components from the GameObjects
         if (HealthBar != null)
         {
-            // HealthBar setup
+            healthBar = HealthBar.GetComponent<HealthBar>();
         }
 
         if (Messages != null)
         {
-            // Messages setup
+            messagesController = Messages.GetComponent<Messages>();
         }
 
         if (Inventory != null)
         {
-            Debug.Log("Inventory GameObject assigned.");
             inventoryUI = Inventory.GetComponent<InventoryUI>();
             if (inventoryUI == null)
             {
                 Debug.LogError("InventoryUI component is not found on the assigned Inventory GameObject!");
-            }
-            else
-            {
-                Debug.Log("InventoryUI component found successfully.");
             }
         }
         else
@@ -59,7 +55,16 @@ public class UIManager : MonoBehaviour
             Debug.LogError("Inventory is not assigned in the UIManager!");
         }
 
-        // Initial clear and welcome message
+        if (FloorInfo != null)
+        {
+            floorText = FloorInfo.GetComponentInChildren<Text>();
+            enemiesText = FloorInfo.GetComponentsInChildren<Text>()[1];
+        }
+        else
+        {
+            Debug.LogError("FloorInfo is not assigned in the UIManager!");
+        }
+
         if (messagesController != null)
         {
             messagesController.Clear();
@@ -67,14 +72,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // Public getter for accessing the InventoryUI component
-    public InventoryUI InventoryUI
-    {
-        get
-        {
-            return inventoryUI;
-        }
-    }
+    public InventoryUI InventoryUI => inventoryUI;
 
     public void UpdateHealth(int current, int max)
     {
@@ -88,11 +86,52 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void SetLevel(int level)
+    {
+        if (healthBar != null)
+        {
+            healthBar.SetLevel(level);
+        }
+        else
+        {
+            Debug.LogError("HealthBar component is not assigned!");
+        }
+    }
+
+    public void SetXP(int xp)
+    {
+        if (healthBar != null)
+        {
+            healthBar.SetXP(xp);
+        }
+        else
+        {
+            Debug.LogError("HealthBar component is not assigned!");
+        }
+    }
+
     public void AddMessage(string message, Color color)
     {
         if (messagesController != null)
         {
             messagesController.AddMessage(message, color);
+        }
+    }
+
+    // Nieuwe methoden toegevoegd
+    public void UpdateFloorInfo(int floorNumber)
+    {
+        if (floorText != null)
+        {
+            floorText.text = "Floor " + floorNumber;
+        }
+    }
+
+    public void UpdateEnemiesInfo(int enemiesLeft)
+    {
+        if (enemiesText != null)
+        {
+            enemiesText.text = enemiesLeft + " enemies left";
         }
     }
 }

@@ -13,11 +13,17 @@ public class Actor : MonoBehaviour
     [SerializeField] private int hitPoints = 30;
     [SerializeField] private int defense;
     [SerializeField] private int power;
+    [SerializeField] private int level = 1; // New variable for Level
+    [SerializeField] private int xp = 0; // New variable for XP
+    [SerializeField] private int xpToNextLevel = 100; // New variable for XP required to reach next level
 
     public int MaxHitPoints => maxHitPoints;
     public int HitPoints => hitPoints;
     public int Defense => defense;
     public int Power => power;
+    public int Level => level; // Getter for Level
+    public int XP => xp; // Getter for XP
+    public int XPToNextLevel => xpToNextLevel; // Getter for XP required to reach next level
 
     private void Start()
     {
@@ -27,12 +33,45 @@ public class Actor : MonoBehaviour
         if (GetComponent<Player>())
         {
             UIManager.Instance.UpdateHealth(hitPoints, maxHitPoints);
+            UIManager.Instance.SetLevel(level);
+            UIManager.Instance.SetXP(xp);
+        }
+    }
+
+    public void AddXp(int xpAmount)
+    {
+        xp += xpAmount;
+
+        while (xp >= xpToNextLevel)
+        {
+            xp -= xpToNextLevel;
+            LevelUp();
+        }
+
+        if (GetComponent<Player>())
+        {
+            UIManager.Instance.SetXP(xp);
+        }
+    }
+
+    private void LevelUp()
+    {
+        level++;
+        xpToNextLevel = Mathf.RoundToInt(xpToNextLevel * 1.5f);
+        maxHitPoints += 10;
+        defense += 2;
+        power += 2;
+
+        if (GetComponent<Player>())
+        {
+            UIManager.Instance.AddMessage("You leveled up!", Color.green);
+            UIManager.Instance.SetLevel(level);
+            UIManager.Instance.UpdateHealth(hitPoints, maxHitPoints);
         }
     }
 
     private void Die()
     {
-        // Display the death message through the UIManager
         if (GetComponent<Player>())
         {
             UIManager.Instance.AddMessage("You died!", Color.red);
@@ -43,18 +82,16 @@ public class Actor : MonoBehaviour
             GameManager.Get.RemoveEnemy(this);
         }
 
-        // Create a gravestone at the actor's position
         Actor gravestoneActor = GameManager.Get.CreateActor("Dead", transform.position);
         if (gravestoneActor != null)
         {
             gravestoneActor.name = $"Remains of {name}";
         }
 
-        // Destroy this actor's game object
         Destroy(gameObject);
     }
 
-    public void DoDamage(int hp)
+    public void DoDamage(int hp, Actor attacker)
     {
         hitPoints -= hp;
         if (hitPoints < 0)
@@ -62,16 +99,18 @@ public class Actor : MonoBehaviour
             hitPoints = 0;
         }
 
-        // If this actor is the player, update the health bar
         if (GetComponent<Player>())
         {
             UIManager.Instance.UpdateHealth(hitPoints, maxHitPoints);
         }
 
-        // If hitPoints are 0, call Die()
         if (hitPoints == 0)
         {
             Die();
+            if (attacker != null && attacker.GetComponent<Player>() != null)
+            {
+                attacker.AddXp(xp);
+            }
         }
     }
 

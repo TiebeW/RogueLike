@@ -146,6 +146,37 @@ public class Player : MonoBehaviour, Controls.IPlayerActions
 
     public void OnSelect(InputAction.CallbackContext context) { }
 
+    // Nieuwe functie voor controle van de ladder
+    public void OnControl(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            HandleControl();
+        }
+    }
+
+    private void HandleControl()
+    {
+        Ladder ladder = GameManager.Get.GetLadderAtLocation(transform.position);
+        if (ladder != null)
+        {
+            // Logica voor wanneer de speler de ladder gebruikt
+            if (ladder.Up)
+            {
+                MapManager.Get.MoveUp();
+            }
+            else
+            {
+                MapManager.Get.MoveDown();
+            }
+            Debug.Log("Ladder found and used.");
+        }
+        else
+        {
+            Debug.Log("No ladder at the player's location.");
+        }
+    }
+
     private void Move()
     {
         Vector2 direction = controls.Player.Movement.ReadValue<Vector2>();

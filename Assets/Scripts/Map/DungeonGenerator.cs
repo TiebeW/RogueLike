@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +8,12 @@ public class DungeonGenerator : MonoBehaviour
     private int maxRooms;
     private int maxEnemies;
     private int maxItems;
+    private int currentFloor;
+
+    private List<string> enemyNames = new List<string>() {
+        "Beetle", "Wasp", "Snake", "RedWasp", "Witch", "ClawBeast", "BatBeast", "DragonMan", "Angel", "Cyclops"
+    };
+
     List<Room> rooms = new List<Room>();
 
     public void SetSize(int width, int height)
@@ -36,6 +41,11 @@ public class DungeonGenerator : MonoBehaviour
     public void SetMaxItems(int max)
     {
         maxItems = max;
+    }
+
+    public void SetCurrentFloor(int floor)
+    {
+        currentFloor = floor;
     }
 
     public void Generate()
@@ -68,7 +78,7 @@ public class DungeonGenerator : MonoBehaviour
                         || y == roomY
                         || y == roomY + roomHeight - 1)
                     {
-                        if (!TrySetWallTile(new Vector3Int(x, y)))
+                        if (!TrySetWallTile(new Vector3Int(x, y, 0)))
                         {
                             continue;
                         }
@@ -77,7 +87,6 @@ public class DungeonGenerator : MonoBehaviour
                     {
                         SetFloorTile(new Vector3Int(x, y, 0));
                     }
-
                 }
             }
 
@@ -95,7 +104,29 @@ public class DungeonGenerator : MonoBehaviour
 
             rooms.Add(room);
         }
-        var player = MapManager.Get.CreateActor("Player", rooms[0].Center());
+
+        // Plaats een ladder naar beneden in het midden van de laatste kamer
+        if (currentFloor > 0)
+        {
+            PlaceLadder(new Vector3(rooms[rooms.Count - 1].X + rooms[rooms.Count - 1].Width / 2, rooms[rooms.Count - 1].Y + rooms[rooms.Count - 1].Height / 2, 0), false);
+        }
+
+        // Als de speler al bestaat, pas dan zijn positie aan en zet hem in het midden van de eerste kamer
+        if (MapManager.Get.GetActor("Player") != null)
+        {
+            MapManager.Get.GetActor("Player").transform.position = new Vector3(rooms[0].X + rooms[0].Width / 2, rooms[0].Y + rooms[0].Height / 2, 0);
+        }
+        // Als de speler nog niet bestaat, maak dan net zoals eerst een nieuwe speler
+        else
+        {
+            var player = MapManager.Get.CreateActor("Player", new Vector3(rooms[0].X + rooms[0].Width / 2, rooms[0].Y + rooms[0].Height / 2, 0));
+        }
+
+        // Als currentFloor groter is dan 0, plaats dan een ladder naar boven in het midden van de eerste kamer
+        if (currentFloor > 0)
+        {
+            PlaceLadder(new Vector3(rooms[0].X + rooms[0].Width / 2, rooms[0].Y + rooms[0].Height / 2, 0), true);
+        }
     }
 
     private bool TrySetWallTile(Vector3Int pos)
@@ -149,7 +180,7 @@ public class DungeonGenerator : MonoBehaviour
         // Stel de tegels in voor deze tunnel
         for (int i = 0; i < tunnelCoords.Count; i++)
         {
-            SetFloorTile(new Vector3Int(tunnelCoords[i].x, tunnelCoords[i].y));
+            SetFloorTile(new Vector3Int(tunnelCoords[i].x, tunnelCoords[i].y, 0));
 
             for (int x = tunnelCoords[i].x - 1; x <= tunnelCoords[i].x + 1; x++)
             {
@@ -166,25 +197,38 @@ public class DungeonGenerator : MonoBehaviour
 
     private void PlaceEnemies(Room room, int maxEnemies)
     {
-        // Het aantal vijanden dat we willen
         int num = Random.Range(0, maxEnemies + 1);
+
+        // Maak een lijst van vijanden in omgekeerde volgorde van sterkte
+        string[] enemyNames = { "Cyclops", "Angel", "DragonMan", "BatBeast", "ClawBeast", "Witch", "RedWasp", "Snake", "Wasp", "Beetle" };
 
         for (int counter = 0; counter < num; counter++)
         {
+            // Bepaal de maximale index op basis van de huidige verdieping
+            int maxIndex = Mathf.Clamp(currentFloor, 0, enemyNames.Length - 1);
+            // Kies een willekeurig monster uit de lijst tot de maximale index
+            int index = Random.Range(0, maxIndex + 1);
+
             // De randen van de kamer zijn muren, dus tel op en trek af met 1
             int x = Random.Range(room.X + 1, room.X + room.Width - 1);
             int y = Random.Range(room.Y + 1, room.Y + room.Height - 1);
 
-            // Maak verschillende vijanden aan
-            if (Random.value < 0.5f)
-            {
-                GameManager.Get.CreateActor("Wasp", new Vector2(x, y));
-            }
-            else
-            {
-                GameManager.Get.CreateActor("Beetle", new Vector2(x, y));
-            }
+            // Maak het geselecteerde monster aan
+            GameManager.Get.CreateActor(enemyNames[index], new Vector2(x, y));
         }
+    }
+
+
+    private string GetEnemyName(int counter)
+    {
+        // We verdelen de enemylijst in secties, afhankelijk van het aantal vijanden dat we willen plaatsen
+        float section = (float)enemyNames.Count / (float)maxEnemies;
+        int index = Mathf.FloorToInt(counter * section);
+
+        // Zorg ervoor dat de index binnen het bereik van de enemyNames-lijst blijft
+        index = Mathf.Clamp(index, 0, enemyNames.Count - 1);
+
+        return enemyNames[index];
     }
 
     private void PlaceItems(Room room, int maxItems)
@@ -214,6 +258,16 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
     }
+
+    private void PlaceLadder(Vector3 position, bool isUp)
+    {
+        if (isUp)
+        {
+            Instantiate(Resources.Load<GameObject>("Prefabs/LadderUp"), position, Quaternion.identity);
+        }
+        else
+        {
+            Instantiate(Resources.Load<GameObject>("Prefabs/LadderDown"), position, Quaternion.identity);
+        }
+    }
 }
-
-
